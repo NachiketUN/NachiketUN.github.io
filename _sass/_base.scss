@@ -8,6 +8,10 @@ p, h1, h2, h3, h4, h5, h6, em, div, li, span, strong {
   color: var(--global-text-color);
 }
 
+h1, span{
+  color: var(--global-theme-color);
+}
+
 hr {
   border-top: 1px solid var(--global-divider-color);
 }
@@ -55,8 +59,9 @@ blockquote {
 // Profile
 
 .profile {
+  margin-top: -4rem;
   margin-left: 1rem;
-  width: 100%;
+  width: 70%;
 
   .address {
     margin-bottom: 5px;
@@ -71,7 +76,7 @@ blockquote {
 
 @media (min-width: 576px) {
   .profile {
-    width: 30%;
+    width: 25%;
     .address {
       p { display: block; }
     }
@@ -145,8 +150,9 @@ blockquote {
   .navbar-brand.social {
     padding-bottom: 0;
     padding-top: 0;
-    font-size: 1.7rem;
+    font-size: 2rem;
     a {
+      margin-right: 15px;
       i::before {
         color: var(--global-text-color);
         -webkit-transition: all 0.2s ease-in-out;
@@ -212,7 +218,8 @@ blockquote {
 .social {
   text-align: center;
   .contact-icons {
-    font-size: 4rem;
+    font-size: 3rem;
+
     a {
       i::before {
         color: var(--global-text-color);
