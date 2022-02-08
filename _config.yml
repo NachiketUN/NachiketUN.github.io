@@ -71,7 +71,7 @@ contact_note: >
   The best way to reach me is by email.
 
 google_analytics: UA-219724407-1 # out your google-analytics code
-panelbear_analytics: XXXXXXXXX # panelbear analytics site ID
+panelbear_analytics: 1FtSFViSCM0 # panelbear analytics site ID
 
 # -----------------------------------------------------------------------------
 # Blog
@@ -236,7 +236,7 @@ jekyll-diagrams:
 # -----------------------------------------------------------------------------
 
 enable_google_analytics:    true  # enables google analytics
-enable_panelbear_analytics: false  # enables panelbear analytics
+enable_panelbear_analytics: true  # enables panelbear analytics
 enable_mansory:             true   # enables automatic project cards arangement
 enable_math:                true   # enables math typesetting (uses MathJax)
 enable_tooltips:            true  # enables automatic tooltip links generated
