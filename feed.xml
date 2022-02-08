@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://nachiketun.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://nachiketun.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2022-02-08T20:24:10+05:30</updated><id>https://nachiketun.github.io/feed.xml</id><title type="html">blank</title><subtitle></subtitle><entry><title type="html">Kafka Connect JDBC Sink Connector (Plain Config and with Schema Registry)</title><link href="https://nachiketun.github.io/blog/2021/Kafka-Connect/" rel="alternate" type="text/html" title="Kafka Connect JDBC Sink Connector (Plain Config and with Schema Registry)" /><published>2021-05-04T23:09:00+05:30</published><updated>2021-05-04T23:09:00+05:30</updated><id>https://nachiketun.github.io/blog/2021/Kafka-Connect</id><content type="html" xml:base="https://nachiketun.github.io/blog/2021/Kafka-Connect/">&lt;p&gt;A quick tutorial to setup Kafka Cluster and sink data from the cluster to Oracle Database&lt;/p&gt;
+
+&lt;h2 id=&quot;1-basic-kafka-setup&quot;&gt;1. Basic Kafka Setup&lt;/h2&gt;
+
+&lt;p&gt;To install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Kafka&lt;/code&gt; on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mac&lt;/code&gt; use :&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;brew &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;kafka
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;For brew installation the configs(property files) will be located in -&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Kafka Configs - /usr/local/etc/kafka&lt;/li&gt;
+  &lt;li&gt;Zookeeper Configs - /usr/local/etc/zookeeper&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Start the zookeeper server and kafka server using these commands.&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties
+ 
+kafka-server-start /usr/local/etc/kafka/server.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now lets create a topic to insert some data into it and use a consumer to read the data back -&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kafka-topics &lt;span class=&quot;nt&quot;&gt;--zookeeper&lt;/span&gt; localhost:2181 &lt;span class=&quot;nt&quot;&gt;--create&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--replication-factor&lt;/span&gt; 1 &lt;span class=&quot;nt&quot;&gt;--partitions&lt;/span&gt; 1 &lt;span class=&quot;nt&quot;&gt;--topic&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; //
+Creates a topic named &lt;span class=&quot;s2&quot;&gt;&quot;test&quot;&lt;/span&gt;
+kafka-console-producer &lt;span class=&quot;nt&quot;&gt;--broker-list&lt;/span&gt; localhost:9092 &lt;span class=&quot;nt&quot;&gt;--topic&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; // This will start a producer to insert
+data into the topic &lt;span class=&quot;s2&quot;&gt;&quot;test&quot;&lt;/span&gt;
+kafka-console-consumer &lt;span class=&quot;nt&quot;&gt;--bootstrap-server&lt;/span&gt; localhost:9092 &lt;span class=&quot;nt&quot;&gt;--topic&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--from-beginning&lt;/span&gt; // Will display all
+the data inserted &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;the topic &lt;span class=&quot;s2&quot;&gt;&quot;test&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;2-kafka-connect-jdbc-setup&quot;&gt;2. Kafka Connect JDBC Setup&lt;/h2&gt;
+
+&lt;p&gt;We will be setting up a JDBC Connector to send data from a kafka topic to Oracle DB.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Download the JDBC Connector zip folder (confluentinc-kafka-connect-jdbc-10.2.0.zip) from this link - https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc&lt;/li&gt;
+  &lt;li&gt;Extract the zip folder and folder will contain the kafka-connect jar and JDBC drivers such as (MYSQL, Postgre,Oracle etc) in the confluentinc-kafka-connect-jdbc-10.2.0/lib location&lt;/li&gt;
+  &lt;li&gt;If the Oracle Driver is not there, manually download it from https://www.oracle.com/database/technologies/
+ jdbc-ucp-122-downloads.html and place it in confluentinc-kafka-connect-jdbc-10.2.0/lib location.&lt;/li&gt;
+  &lt;li&gt;We will be running connect worker in standalone mode&lt;/li&gt;
+  &lt;li&gt;Creata a connect.offsets file in confluentinc-kafka-connect-jdbc-10.2.0/tmp location where the connect
+     worker will store offsets&lt;/li&gt;
+  &lt;li&gt;Create a worker.properties and oracle.properties file in confluentinc-kafka-connect-jdbc-10.2.0/ location&lt;/li&gt;
+  &lt;li&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;Path to the kafka connect extracted folder&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;/confluentinc-kafka-connect-jdbc-10.2.0/
+&lt;span class=&quot;nb&quot;&gt;mkdir &lt;/span&gt;tmp
+&lt;span class=&quot;nb&quot;&gt;touch &lt;/span&gt;tmp/connect.offsets
+&lt;span class=&quot;nb&quot;&gt;touch &lt;/span&gt;worker.properties
+&lt;span class=&quot;nb&quot;&gt;touch &lt;/span&gt;oracle.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;a. worker.properties&lt;/p&gt;
+    &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; bootstrap.servers=127.0.0.1:9092
+ group.id=connect-cluster-2
+ key.converter=org.apache.kafka.connect.storage.StringConverter
+ value.converter=org.apache.kafka.connect.json.JsonConverter
+ key.converter.schemas.enable=true
+ value.converter.schemas.enable=true
+ internal.key.converter=org.apache.kafka.connect.storage.StringConverter
+ internal.value.converter=org.apache.kafka.connect.json.JsonConverter
+ internal.key.converter.schemas.enable=false
+ internal.value.converter.schemas.enable=false
+ offset.storage.topic=connect-offsets-2
+ offset.storage.replication.factor=1
+ config.storage.topic=connect-configs-2
+ config.storage.replication.factor=1
+ status.storage.topic=connect-status-2
+ status.storage.replication.factor=1
+ offset.flush.interval.ms=10000
+ rest.host.name=127.0.0.1
+ rest.port=8084
+    
+ offset.storage.file.filename=/{Path to the kafka connect extracted folder}/confluentinc-
+ kafka-connect-jdbc-10.2.0/tmp/connect.offsets
+    
+ plugin.path=/{Path to the kafka connect extracted folder}/confluentinc-kafka-connect-
+ jdbc-10.2.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;b. oracle.properties&lt;/p&gt;
+    &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; name=oracle-connector
+ connector.class=io.confluent.connect.jdbc.JdbcSinkConnector
+ tasks.max=1
+ topics=test
+ key.converter=org.apache.kafka.connect.storage.StringConverter
+ key.converter.schemas.enable=true
+ value.converter=org.apache.kafka.connect.json.JsonConverter
+ value.converter.schemas.enable=true
+ dialect.name=OracleDatabaseDialect
+ connection.url=jdbc:oracle:thin:@//sl73commdb7q-scan:1521/COMM70Q
+ connection.user=VBOX750_VRD_SRVR
+ connection.password=password
+ table.name.format=TVPPR_QTZ_LOCKS
+ insert.mode=insert
+ pk.mode=none
+ auto.create=false
+ auto.evolve=false
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;c. In worker.properties make replace the correct paths for offset.storage.file.filename and plugin.path&lt;/p&gt;
+    &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; offset.storage.file.filename=/{Path to the kafka connect extracted folder}/confluentinc-
+ kafka-connect-jdbc-10.2.0/tmp/connect.offsets
+ 
+ plugin.path=/{Path to the kafka connect extracted folder}/confluentinc-kafka-connect-
+ jdbc-10.2.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;&lt;strong&gt;Note: DO NOT GIVE THE PLUGIN PATH AS /path to extracted folder/confluentinc-kafka-connect-
+ jdbc-10.2.0/lib&lt;/strong&gt;, this will result in connector throwing this error “Caused by:
+ org.apache.kafka.connect.errors.ConnectException: java.sql.SQLException: No suitable driver found
+ for jdbc:oracle:”&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Make sure your directory roughly looks like this
+    &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  /{Path to the kafka connect extracted folder}/confluentinc-kafka-connect-jdbc-10.2.0/
+     lib/
+         kafka-connect-jdbc-10.2.0.jar ojdbc8.jar
+     tmp/
+     connect.offsets
+     worker.properties
+     oracle.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;To start the connector worker in standalone mode use
+    &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /{Path to the kafka connect extracted folder}/confluentinc-kafka-connect-jdbc-10.2.0/
+connect-standalone worker.properties oracle.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If you encounter errors such as “Caused by: org.apache.kafka.connect.errors.ConnectException:
+java.sql.SQLException: No suitable driver found for jdbc:oracle:”, it might be due to the following reasons&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;plugin.path in worker.properties is wrong (it should be /{path}/confluentinc-kafka-connect-jdbc-10.2.0 instead of /{path}/confluentinc-kafka-connect-jdbc-10.2.0/lib)&lt;/li&gt;
+  &lt;li&gt;ojdbc8.jar is missing from /{path}/confluentinc-kafka-connect-jdbc-10.2.0/lib&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">A quick tutorial to setup Kafka Cluster and sink data from the cluster to Oracle Database</summary></entry></feed>

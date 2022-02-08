@@ -2,7 +2,7 @@
 <html lang="en">
 
   <head>
-    <meta http-equiv="refresh" content="3; url=https://nachiketun.github.io/" />
+    
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,7 +12,7 @@
   Nachiket  Naganure
 
 
-  | Page not found
+  | a post with code
 
 </title>
 <meta name="description" content="">
@@ -37,7 +37,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
 
 <link rel="stylesheet" href="/assets/css/main.css">
-<link rel="canonical" href="https://nachiketun.github.io/404.html">
+<link rel="canonical" href="https://nachiketun.github.io/archive/2015-07-15-code/">
 
 
 <!-- Dark Mode -->
@@ -148,17 +148,92 @@
     <!-- Content -->
 
     <div class="container mt-5">
-      <div class="post">
+      
+
+
+
+
+
+<div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Page not found</h1>
-    <p class="post-description">Looks like there has been a mistake. Nothing exists here.</p>
+    <h1 class="post-title">a post with code</h1>
+    <p class="post-meta">July 15, 2015</p>
+    <p class="post-tags">
+      <a href="/blog/2015"> <i class="fas fa-calendar fa-sm"></i> 2015 </a>
+      
+        ·  
+        
+        <a href="/blog/tag/formatting%20code">
+          <i class="fas fa-hashtag fa-sm"></i> formatting code</a>  
+          
+      
+
+      
+        ·  
+        
+        <a href="/blog/category/sample-posts">
+          <i class="fas fa-tag fa-sm"></i> sample-posts</a>  
+          
+      
+
+    </p>
   </header>
 
-  <article>
-    <p>You will be redirected to the main page within 3 seconds. If not redirected, please click <a href="https://nachiketun.github.io/">here</a>.</p>
+  <article class="post-content">
+    <p>This theme implements a built-in Jekyll feature, the use of Rouge, for syntax highlighting.
+It supports more than 100 languages.
+This example is in C++.
+All you have to do is wrap your code in a liquid tag:</p>
+
+<p>{% highlight c++ linenos %}  <br> code code code <br> {% endhighlight %}</p>
+
+<p>The keyword <code class="language-plaintext highlighter-rouge">linenos</code> triggers display of line numbers.
+Produces something like this:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr>
+<td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td>
+<td class="code"><pre>int main<span class="o">(</span>int argc, char const <span class="se">\*</span>argv[]<span class="o">)</span>
+<span class="o">{</span>
+    string myString<span class="p">;</span>
+
+    cout &lt;&lt; <span class="s2">"input a string: "</span><span class="p">;</span>
+    getline<span class="o">(</span>cin, myString<span class="o">)</span><span class="p">;</span>
+    int length <span class="o">=</span> myString.length<span class="o">()</span><span class="p">;</span>
+
+    char charArray <span class="o">=</span> new char <span class="k">*</span> <span class="o">[</span>length]<span class="p">;</span>
+
+    charArray <span class="o">=</span> myString<span class="p">;</span>
+    <span class="k">for</span><span class="o">(</span>int i <span class="o">=</span> 0<span class="p">;</span> i &lt; length<span class="p">;</span> ++i<span class="o">){</span>
+        cout <span class="o">&lt;&lt;</span> <span class="no">charArray</span><span class="sh">[i] &lt;&lt; " ";
+    }
+
+    return 0;
+}</span>
+</pre></td>
+</tr></tbody></table></code></pre></figure>
+
 
   </article>
+
+  
 
 </div>
 
